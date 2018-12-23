@@ -3,6 +3,8 @@
 namespace AppBundle\Utils;
 
 use Symfony\Component\HttpFoundation\Request;
+use AppBundle\Utils\TorreAPI;
+use AppBundle\Utils\LinkedInAPI;
 
 /**
  * Utilities
@@ -32,28 +34,53 @@ class Utils {
 		return implode('', $pieces);
 	}
 
-	static function makeHTTPRequest($url, $method, $data) {
+	static function makeHTTPRequest($url, $method, $data, $jsonFields=false, $bearer=null) {
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL, $url);
+		$headers = [];
 		//curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
 
 		switch ($method) {
 			case Request::METHOD_POST:
-				$data_string = json_encode($data);
 				curl_setopt($ch, CURLOPT_POST, 1);
-				curl_setopt($ch, CURLOPT_POSTFIELDS, $data_string);
-				curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-					'Content-Type: application/json',
-					'Content-Length: ' . strlen($data_string))
-				);
+				if($jsonFields){
+					$data_string = json_encode($data);
+					curl_setopt($ch, CURLOPT_POSTFIELDS, $data_string);
+					$headers[] = 'Content-Type: application/json';
+					$headers[] = 'Content-Length: ' . strlen($data_string);
+				}else{
+					$headers[] = 'Content-Type: application/x-www-form-urlencoded';
+					curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+				}
 				break;
 			case Request::METHOD_GET:
 				break;
 		}
+
+		// Bearer if needed
+		if(!is_null($bearer)){
+			$headers[] = "Authorization: Bearer ".$bearer;
+		}
+
+		curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 		$result = curl_exec($ch);
 		curl_close($ch);
 		return $result;
+	}
+
+
+	static function mergeLinkedInAndTorreBio($linkedInInfo, $torreBioInfo){
+
+		// Headline and location are taken from linkedIn, remaining information from TorreBio
+		$merge[TorreAPI::TORREAPI_KEY_NAME] = $torreBioInfo[TorreAPI::TORREAPI_KEY_NAME];
+		$merge[TorreAPI::TORREAPI_KEY_HEADLINE] = $linkedInInfo[LinkedInAPI::KEY_HEADLINE];
+		$merge[TorreAPI::TORREAPI_KEY_LOCATION] = $linkedInInfo[LinkedInAPI::KEY_LOCATION];
+		$merge[TorreAPI::TORREAPI_KEY_SKILLS] = $torreBioInfo[TorreAPI::TORREAPI_KEY_SKILLS];
+		$merge[TorreAPI::TORREAPI_KEY_ASPIRATIONS] = $torreBioInfo[TorreAPI::TORREAPI_KEY_ASPIRATIONS];
+		$merge[TorreAPI::TORREAPI_KEY_EDUCATIONS] = $torreBioInfo[TorreAPI::TORREAPI_KEY_EDUCATIONS];
+		$merge[TorreAPI::TORREAPI_KEY_INTERESTS] = $torreBioInfo[TorreAPI::TORREAPI_KEY_INTERESTS];
+		return $merge;
 	}
 
 }

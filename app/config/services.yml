@@ -2,6 +2,10 @@
 # https://symfony.com/doc/current/service_container.html
 parameters:
     #parameter_name: value
+    #host_public_name: 'http://example.com'
+    host_public_name: 'http://186.82.4.55'
+    client_id: '78mdjkkgam6bv8'
+    client_secret: 'VMN9zVbC9lHFMaGM'
 
 services:
     # default configuration for services in *this* file

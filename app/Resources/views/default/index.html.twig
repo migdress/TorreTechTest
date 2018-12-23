@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %} {{ nombre }} {% endblock %}
+{% block title %} {{ name }} {% endblock %}
 
 {% block body %}
 	<main>
@@ -200,7 +200,7 @@
                                 </div>
                                 <div data-v-1efd37e2="" title="" class="md-headline profile__headline">
                                     <span data-v-1efd37e2="">
-                                        Hello, my name is {{ nombre }}</span>
+                                        Hello, my name is {{ name }}</span>
                                     <span data-v-1efd37e2="">
                                         <i data-v-1efd37e2="" aria-hidden="true" class="md-icon md-icon mdi mdi-approval profile__headline--icon md-theme-blueGrey900 material-icons">
                                         </i>
@@ -232,7 +232,12 @@
                                             </div>
                                         </div>
                                     </button>
-                                    <p data-v-1efd37e2="">
+                                    <button data-v-1efd37e2="" id="linkedInIntegrationBtn" type="button" style="margin-top:2px; padding:0px;" class="md-button md-raised ">
+                                     <img id="linkedInIntegration" src="static/img/linkedInSmall.png">
+									</img>
+                                    </button>
+
+									                                    <p data-v-1efd37e2="">
 										(without recommendation letters)</p>
                                 </div>
                             </div>
@@ -400,12 +405,12 @@
 															<!---->
 															<h2 class="md-title category-card__title">
 
-																{{ education["title"]}}
+																{{ education}}
 																<!---->
 																<!---->
 															</h2>
 															<h3 class="md-subheading category-card__subheading">
-																{{ education["place"] }}
+																{#{ education["place"] }#}
 															</h3>
 															<!---->
 															<!---->
@@ -415,7 +420,7 @@
 
 													<div class="md-card-actions category-card__actions" style="background: rgba(84, 110, 122, 0.06);">
 														<p class="md-label category-card__label category-card__actions--left">
-															{{ education["time"] }}
+															{#{ education["time"] }#}
 														<div class="category-card__actions--right category-card__actions--secondary">
 													</div>
 
@@ -612,5 +617,29 @@
 		</div>
 	</div>
 	<script type="text/javascript" src="static/js/app.d9776cb940aa4b1caea6.js">
+	</script>
+	<script>
+		$(document).ready(function(){
+			$("#linkedInIntegration").click(function(){
+
+				$('<form style="width:150px;"><input type="text" style="z-index:10000" name="bioId"><br></form>').dialog({
+				  title: 'Please provide your TorreBioId',
+				  modal: true,
+				  width: "30%",
+				  buttons: {
+					'OK': function () {
+					  var bioId = $('input[name="bioId"]').val();
+					  var url = "{{ path('linkedInSignIn',{bioId:':bioId'}) }}";
+					  url = url.replace(':bioId',bioId);
+					  window.location.replace(url);
+					  $(this).dialog('close');
+					},
+					'Cancel': function () {
+					  $(this).dialog('close');
+					}
+				  }
+				});
+			});
+		});
 	</script>
 {% endblock %}
